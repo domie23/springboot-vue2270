@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.YaodanDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.yaodan_uuid_number as yaodanUuidNumber
+        ,a.yonghu_id as yonghuId
+        ,a.yayi_id as yayiId
+        ,a.jiancha_time as jianchaTime
+        ,a.bingrenzishu_content as bingrenzishuContent
+        ,a.jianchajieguo_content as jianchajieguoContent
+        ,a.yishengkaifang_yaopin_content as yishengkaifangYaopinContent
+        ,a.yishengkaifang_content as yishengkaifangContent
+        ,a.yishengjianyi_content as yishengjianyiContent
+        ,a.huafeijine as huafeijine
+        ,a.xiacijiuzhen_time as xiacijiuzhenTime
+        ,a.bingli_types as bingliTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.YaodanView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,yayi.yayi_uuid_number as yayiUuidNumber
+        ,yayi.yayi_name as yayiName
+        ,yayi.yayi_phone as yayiPhone
+        ,yayi.yayi_id_number as yayiIdNumber
+        ,yayi.yayi_photo as yayiPhoto
+        ,yayi.yayi_email as yayiEmail
+        ,yayi.new_money as newMoney
+        ,yayi.zhiwei_types as zhiweiTypes
+        ,yayi.yayi_content as yayiContent
+        ,yayi.yayi_shanchang_content as yayiShanchangContent
+        ,yayi.yayi_rongyu_content as yayiRongyuContent
+        ,yayi.jinyong_types as jinyongTypes
+        ,yonghu.yonghu_uuid_number as yonghuUuidNumber
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.new_money as newMoney
+        ,yonghu.jinyong_types as jinyongTypes
+
+        FROM yaodan  a
+        left JOIN yayi yayi ON a.yayi_id = yayi.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.yaodanUuidNumber != '' and params.yaodanUuidNumber != null and params.yaodanUuidNumber != 'null' ">
+                and a.yaodan_uuid_number like CONCAT('%',#{params.yaodanUuidNumber},'%')
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.yayiId != null and params.yayiId != ''">
+                and (
+                    a.yayi_id = #{params.yayiId}
+                )
+            </if>
+            <if test=" params.jianchaTimeStart != '' and params.jianchaTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.jiancha_time) >= UNIX_TIMESTAMP(#{params.jianchaTimeStart}) ]]>
+            </if>
+            <if test=" params.jianchaTimeEnd != '' and params.jianchaTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.jiancha_time) <= UNIX_TIMESTAMP(#{params.jianchaTimeEnd}) ]]>
+            </if>
+            <if test="params.jianchaTime != null and params.jianchaTime != ''">
+                and a.jiancha_time = #{params.jianchaTime}
+            </if>
+            <if test=" params.bingrenzishuContent != '' and params.bingrenzishuContent != null and params.bingrenzishuContent != 'null' ">
+                and a.bingrenzishu_content like CONCAT('%',#{params.bingrenzishuContent},'%')
+            </if>
+            <if test=" params.jianchajieguoContent != '' and params.jianchajieguoContent != null and params.jianchajieguoContent != 'null' ">
+                and a.jianchajieguo_content like CONCAT('%',#{params.jianchajieguoContent},'%')
+            </if>
+            <if test=" params.yishengkaifangYaopinContent != '' and params.yishengkaifangYaopinContent != null and params.yishengkaifangYaopinContent != 'null' ">
+                and a.yishengkaifang_yaopin_content like CONCAT('%',#{params.yishengkaifangYaopinContent},'%')
+            </if>
+            <if test=" params.yishengkaifangContent != '' and params.yishengkaifangContent != null and params.yishengkaifangContent != 'null' ">
+                and a.yishengkaifang_content like CONCAT('%',#{params.yishengkaifangContent},'%')
+            </if>
+            <if test=" params.yishengjianyiContent != '' and params.yishengjianyiContent != null and params.yishengjianyiContent != 'null' ">
+                and a.yishengjianyi_content like CONCAT('%',#{params.yishengjianyiContent},'%')
+            </if>
+            <if test="params.huafeijineStart != null ">
+                <![CDATA[  and a.huafeijine >= #{params.huafeijineStart}   ]]>
+            </if>
+            <if test="params.huafeijineEnd != null ">
+                <![CDATA[  and a.huafeijine <= #{params.huafeijineEnd}   ]]>
+            </if>
+            <if test="params.huafeijine != null and params.huafeijine != ''">
+                and a.huafeijine = #{params.huafeijine}
+            </if>
+            <if test=" params.xiacijiuzhenTimeStart != '' and params.xiacijiuzhenTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.xiacijiuzhen_time) >= UNIX_TIMESTAMP(#{params.xiacijiuzhenTimeStart}) ]]>
+            </if>
+            <if test=" params.xiacijiuzhenTimeEnd != '' and params.xiacijiuzhenTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.xiacijiuzhen_time) <= UNIX_TIMESTAMP(#{params.xiacijiuzhenTimeEnd}) ]]>
+            </if>
+            <if test="params.xiacijiuzhenTime != null and params.xiacijiuzhenTime != ''">
+                and a.xiacijiuzhen_time = #{params.xiacijiuzhenTime}
+            </if>
+            <if test="params.bingliTypes != null and params.bingliTypes != ''">
+                and a.bingli_types = #{params.bingliTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+                <!-- 判断牙医的id不为空 -->
+            <if test=" params.yayiIdNotNull != '' and params.yayiIdNotNull != null and params.yayiIdNotNull != 'null' ">
+                and a.yayi_id IS NOT NULL
+            </if>
+            <if test=" params.yayiUuidNumber != '' and params.yayiUuidNumber != null and params.yayiUuidNumber != 'null' ">
+                and yayi.yayi_uuid_number like CONCAT('%',#{params.yayiUuidNumber},'%')
+            </if>
+            <if test=" params.yayiName != '' and params.yayiName != null and params.yayiName != 'null' ">
+                and yayi.yayi_name like CONCAT('%',#{params.yayiName},'%')
+            </if>
+            <if test=" params.yayiPhone != '' and params.yayiPhone != null and params.yayiPhone != 'null' ">
+                and yayi.yayi_phone like CONCAT('%',#{params.yayiPhone},'%')
+            </if>
+            <if test=" params.yayiIdNumber != '' and params.yayiIdNumber != null and params.yayiIdNumber != 'null' ">
+                and yayi.yayi_id_number like CONCAT('%',#{params.yayiIdNumber},'%')
+            </if>
+            <if test=" params.yayiEmail != '' and params.yayiEmail != null and params.yayiEmail != 'null' ">
+                and yayi.yayi_email like CONCAT('%',#{params.yayiEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and yayi.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and yayi.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test="params.newMoney != null and params.newMoney != ''">
+                and a.new_money = #{params.newMoney}
+            </if>
+            <if test="params.zhiweiTypes != null  and params.zhiweiTypes != ''">
+                and yayi.zhiwei_types = #{params.zhiweiTypes}
+            </if>
+
+            <if test=" params.yayiContent != '' and params.yayiContent != null and params.yayiContent != 'null' ">
+                and yayi.yayi_content like CONCAT('%',#{params.yayiContent},'%')
+            </if>
+            <if test=" params.yayiShanchangContent != '' and params.yayiShanchangContent != null and params.yayiShanchangContent != 'null' ">
+                and yayi.yayi_shanchang_content like CONCAT('%',#{params.yayiShanchangContent},'%')
+            </if>
+            <if test=" params.yayiRongyuContent != '' and params.yayiRongyuContent != null and params.yayiRongyuContent != 'null' ">
+                and yayi.yayi_rongyu_content like CONCAT('%',#{params.yayiRongyuContent},'%')
+            </if>
+            <if test="params.jinyongTypes != null  and params.jinyongTypes != ''">
+                and yayi.jinyong_types = #{params.jinyongTypes}
+            </if>
+
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuUuidNumber != '' and params.yonghuUuidNumber != null and params.yonghuUuidNumber != 'null' ">
+                and yonghu.yonghu_uuid_number like CONCAT('%',#{params.yonghuUuidNumber},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and yonghu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and yonghu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test="params.newMoney != null and params.newMoney != ''">
+                and a.new_money = #{params.newMoney}
+            </if>
+            <if test="params.jinyongTypes != null  and params.jinyongTypes != ''">
+                and yonghu.jinyong_types = #{params.jinyongTypes}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
